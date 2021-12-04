@@ -1,9 +1,13 @@
 from typing import List
 import motor.motor_asyncio
+from dotenv import load_dotenv
+import os
 
 from bson.objectid import ObjectId
 
-MONGO_DETAILS = "mongodb://nade404:nade404@127.0.0.1:27017"
+load_dotenv()
+
+MONGO_DETAILS = os.environ.get("MONGO_DETAILS")
 
 client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
 
