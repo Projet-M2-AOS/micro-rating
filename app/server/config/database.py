@@ -7,13 +7,13 @@ from bson.objectid import ObjectId
 
 load_dotenv()
 
-MONGO_DETAILS = os.environ.get("MONGO_DETAILS")
+MONGO_URL = os.environ.get("MONGO_URL")
 
-client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_DETAILS)
+client = motor.motor_asyncio.AsyncIOMotorClient(MONGO_URL)
 
 database = client.ratings
 
-ratings_collection = database.get_collection("ratings_collection")
+ratings_collection = database.get_collection("ratings")
 
 def rating_deserializer(rating) -> dict:
     return {
