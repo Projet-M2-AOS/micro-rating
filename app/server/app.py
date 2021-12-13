@@ -3,7 +3,7 @@ from app.server.routes.rating import router as RatingRouter
 
 app = FastAPI()
 
-app.include_router(RatingRouter, tags=["Rating"], prefix="/rating")
+app.include_router(RatingRouter, tags=["Ratings"], prefix="/ratings")
 
 @app.get("/", tags=["Root"])
 async def read_root():
