@@ -1,8 +1,8 @@
-from typing import List
+import logging
+from typing import Any, List
 from bson.objectid import ObjectId
-from fastapi import APIRouter, Body, HTTPException, status
+from fastapi import APIRouter, Body, HTTPException, Response, status, logger
 from fastapi.encoders import jsonable_encoder
-from starlette.status import HTTP_201_CREATED
 
 from app.server.config.database import (
     create_many,
@@ -22,16 +22,23 @@ from app.server.models.rating import (
 router = APIRouter()
 
 @router.post("/", response_description="Rating data added into the database", status_code=status.HTTP_201_CREATED)
-async def createRating(rating: List[RatingSchema] = Body(...)):
+async def createRating(response: Response, rating: List[RatingSchema] = Body(default=None)):
+    if rating == None:
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ErrorResponseModel(status.HTTP_400_BAD_REQUEST, "Validation failed (parsable array expected)", "Bad Request")
+
+    if len(rating) == 0:
+        return rating
+        
     rating = jsonable_encoder(rating)
     if (rating_validator(rating)):
         new_rating = await create_many(rating)
         if (new_rating):
             return ResponseModel(new_rating, "Rating added successfully.")
         else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Toto1")
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Toto2")
 
 @router.get("/", response_description="Get all rating data", status_code=status.HTTP_200_OK)
 async def findAllRating():
