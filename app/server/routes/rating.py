@@ -34,7 +34,9 @@ async def createRating(response: Response, rating: List[RatingSchema] = Body(def
     if (rating_validator(rating)):
         new_rating = await create_many(rating)
         if (new_rating):
-            return ResponseModel(new_rating, "Rating added successfully.")
+            for i in range(len(new_rating)):
+                new_rating[i]["_id"] = new_rating[i].pop("id")
+            return new_rating
         else:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Toto1")
     else:
@@ -42,40 +44,50 @@ async def createRating(response: Response, rating: List[RatingSchema] = Body(def
 
 @router.get("/", response_description="Get all rating data", status_code=status.HTTP_200_OK)
 async def findAllRating():
-    rating = await find_all()
-    return ResponseModel(rating, "All rating retrieved successfully.")
+    ratings = await find_all()
+    for i in range(len(ratings)):
+        ratings[i]["_id"] = ratings[i].pop("id")
+    return ratings
 
 @router.get("/{id}", response_description="Get all rating data", status_code=status.HTTP_200_OK)
-async def findOneRating(id : str):
+async def findOneRating(response: Response, id : str):
     if (ObjectId.is_valid(id)):
         rating = await find_one(id)
         if rating:
-            return ResponseModel(rating, "Rating retrieved successfully.")
+            rating["_id"] = rating.pop("id")
+            return rating
         else:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Rating not found")
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return {"statusCode":status.HTTP_404_NOT_FOUND, "message":"Not found"}
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ErrorResponseModel(status.HTTP_400_BAD_REQUEST, "Invalid ObjectId", "Bad Request")
 
 @router.put("/{id}", response_description="Update a rating", status_code=status.HTTP_200_OK)
-async def updateOneRating(id: str, ratingUpdate: UpdateRatingModel = Body(...)):
+async def updateOneRating(response: Response, id: str, ratingUpdate: UpdateRatingModel = Body(...)):
     if (ObjectId.is_valid(id)):
         ratingUpdate = {k: v for k, v in ratingUpdate.dict().items() if v is not None}
         updateRating = await update(id, ratingUpdate)
         if updateRating:
             updatedRating = await find_one(id)
-            return ResponseModel(updatedRating, "Rating updated successfully.")
+            updatedRating["_id"] = updatedRating.pop("id")
+            return updatedRating
         else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")  
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return {"statusCode":status.HTTP_404_NOT_FOUND, "message":"Not found"}
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")  
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ErrorResponseModel(status.HTTP_400_BAD_REQUEST, "Invalid ObjectId", "Bad Request")
 
 @router.delete("/{id}", response_description="Update a rating", status_code=status.HTTP_204_NO_CONTENT)
-async def deleteOneRating(id: str):
+async def deleteOneRating(response: Response, id: str):
     if (ObjectId.is_valid(id)):
         deleteRating = await delete(id)
-        if (deleteRating):
-            return ResponseModel(None, "Rating deleted successfully.")
+        if deleteRating:
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
         else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")  
+            response.status_code = status.HTTP_404_NOT_FOUND
+            return {"statusCode":status.HTTP_404_NOT_FOUND, "message":"Not found"}
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Bad request")     
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return ErrorResponseModel(status.HTTP_400_BAD_REQUEST, "Invalid ObjectId", "Bad Request")    
