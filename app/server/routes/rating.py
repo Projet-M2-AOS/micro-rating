@@ -1,8 +1,9 @@
 import logging
 from typing import Any, List
 from bson.objectid import ObjectId
-from fastapi import APIRouter, Body, HTTPException, Response, status, logger
+from fastapi import Body, HTTPException, Response, status, logger
 from fastapi.encoders import jsonable_encoder
+from app.server.routes.router import APIRouter
 
 from app.server.config.database import (
     create_many,
