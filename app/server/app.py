@@ -18,3 +18,7 @@ app.include_router(RatingRouter, tags=["Ratings"], prefix="/ratings")
 @app.get("/", tags=["Root"])
 async def read_root():
     return {"message": "Welcome to this fantastic app!"}
+
+@app.get("/docs-json")
+async def getOpenApi():
+    return app.openapi()
