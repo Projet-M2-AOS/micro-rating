@@ -27,7 +27,7 @@ def rating_deserializer(rating) -> dict:
 def rating_validator(rating) -> bool:
     result = True
     for r in rating:
-        if not ObjectId.is_valid(r["product"]) and not ObjectId.is_valid(r["user"]) and not ObjectId.is_valid(r["score"]):
+        if not ObjectId.is_valid(r["product"]) and not ObjectId.is_valid(r["user"]):
             return False
     return result
    

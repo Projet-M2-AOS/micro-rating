@@ -1,7 +1,7 @@
 import logging
 from typing import Any, List
 from bson.objectid import ObjectId
-from fastapi import Body, HTTPException, Response, status, logger
+from fastapi import Body, Response, status, logger
 from fastapi.encoders import jsonable_encoder
 from app.server.routes.router import APIRouter
 
@@ -39,9 +39,9 @@ async def createRating(response: Response, rating: List[RatingSchema] = Body(def
                 new_rating[i]["_id"] = new_rating[i].pop("id")
             return new_rating
         else:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Toto1")
+            return ErrorResponseModel(status.HTTP_400_BAD_REQUEST, "Cannot insert new rating", "Bad Request")
     else:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Toto2")
+        return ErrorResponseModel(status.HTTP_400_BAD_REQUEST, "Error while validating rating, product or user field is not ObjectID", "Bad Request")
 
 @router.get("/", response_description="Get all rating data", status_code=status.HTTP_200_OK)
 async def findAllRating():
