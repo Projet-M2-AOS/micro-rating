@@ -1,5 +1,5 @@
 import logging
-from typing import Any, List
+from typing import Any, List, Optional
 from bson.objectid import ObjectId
 from fastapi import Body, Response, status, logger
 from fastapi.encoders import jsonable_encoder
@@ -44,8 +44,8 @@ async def createRating(response: Response, rating: List[RatingSchema] = Body(def
         return ErrorResponseModel(status.HTTP_400_BAD_REQUEST, "Error while validating rating, product or user field is not ObjectID", "Bad Request")
 
 @router.get("/", response_description="Get all rating data", status_code=status.HTTP_200_OK)
-async def findAllRating():
-    ratings = await find_all()
+async def findAllRating(userId : Optional[str] = None, productId : Optional[str] = None):
+    ratings = await find_all(userId, productId)
     for i in range(len(ratings)):
         ratings[i]["_id"] = ratings[i].pop("id")
     return ratings

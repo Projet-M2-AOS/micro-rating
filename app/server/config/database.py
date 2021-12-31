@@ -31,9 +31,20 @@ def rating_validator(rating) -> bool:
             return False
     return result
    
-async def find_all():
+async def find_all(userId, productId):
     ratings = []
-    async for rating in ratings_collection.find():
+    query = {}
+    if userId and productId:
+        query = {'$and': [
+            {'user':{'$eq':userId}},
+            {'product':{'$eq':productId}}
+        ]}
+    elif userId:
+        query = {'user':{'$eq':userId}}
+    elif productId:
+        query = {'product':{'$eq':productId}}
+        
+    async for rating in ratings_collection.find(query):
         ratings.append(rating_deserializer(rating))
     return ratings
 
@@ -49,7 +60,6 @@ async def create_many(rating_data: List[dict]) -> List[dict]:
     new_rating = []
     async for r in ratings_collection.find({"_id": {"$in": rating.inserted_ids}}):
         new_rating.append(rating_deserializer(r))
-    print(new_rating)
     return new_rating
 
 async def update(id: str, data: dict):
