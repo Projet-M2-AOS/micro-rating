@@ -4,6 +4,8 @@ from fastapi import APIRouter as FastAPIRouter
 from fastapi.types import DecoratedCallable
 
 
+#FastAPI router extension, allow to fix some issues with Uvicorn and path with "/" at the end.
+#Kong gateway add a "/" char at the end of api route, that can make FastAPI route unreachable.
 class APIRouter(FastAPIRouter):
     def api_route(
         self, path: str, *, include_in_schema: bool = True, **kwargs: Any
