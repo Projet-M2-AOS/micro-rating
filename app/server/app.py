@@ -13,7 +13,7 @@ async def validation_exception_handler(request: requests, exc: RequestValidation
         content={'statusCode': status.HTTP_400_BAD_REQUEST, 'message': str(exc).split("\n"), "error":"Bad request"},
     )
 
-app.include_router(RatingRouter, tags=["Ratings"], prefix="/ratings")
+app.include_router(RatingRouter, tags=["micro-ratings"], prefix="/ratings")
 
 @app.get("/", tags=["Root"])
 async def read_root():
